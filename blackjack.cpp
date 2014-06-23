@@ -31,10 +31,19 @@ bool playerBlackjack;		// Used to indicate player Blackjack
 bool houseBlackjack;		// Used to indicate house Blackjack
 bool insurance;				// Used to indicate house upcard of an ACE
 bool playerDouble;			// Used to indicate a player doubling down
+bool playerDouble2;
+bool playerDouble3;
+bool playerDouble4;
 bool playerSurrender;		// Used to indicate a player surrendering
 bool firstHand;				// Used to indicate a a freshly dealt hand
 vector<card> players_hand; 			// The player's hand
 bool playerSoftHand;	//indicates the player has a soft hand
+vector<card> players_hand2; // The rest of these hands are used only when a player splits his hand
+bool playerSoftHand2;
+vector<card> players_hand3;
+bool playerSoftHand3;
+vector<card> players_hand4;
+bool playerSoftHand4;
 vector<card> house_hand; 	// The houses hand
 bool houseSoftHand;		//indicates the house has a soft hand
 vector<card> deck;		// The deck used to deal cards
@@ -44,6 +53,7 @@ void shuffle(vector<card> &deck); //used to reshuffle the deck
 void dealCards(vector<card> &deck, vector<card> &players_hand, vector<card> &house_hand); // Deals the cards to the player and the house
 void hit(vector<card> &players_hand); //add's one card to a hand (either the player's or the house's
 void doubleDown(vector<card> &players_hand); // Double down: Player gets one more card and they double their bet
+void split(vector<card> &players_hand); 	// Player splits his hand, gets one more card for each hand, and plays the remainder of each hand
 void surrender(vector<card> &players_hand);  //Surrender the hand to the house, lose half of original bet
 void playerLogic(vector<card> &players_hand); // The logic the player will follow
 void houseLogic(vector<card> &house_hand);
@@ -53,7 +63,6 @@ int main( int argc, char ** argv ) {
 	srand(time(NULL));
 	string command = "";
 
-	cin >> command;
 	while(command != "q") {
 		play();
 
@@ -62,6 +71,24 @@ int main( int argc, char ** argv ) {
 		cout << "Your hand is: " << endl;
 		for(unsigned i = 0; i < players_hand.size(); i++){
 			cout << players_hand[i].r << " of " << players_hand[i].s << endl;
+		}
+		if (!players_hand2.empty()) {
+			cout << "Your second hand is: " << endl;
+			for(unsigned i = 0; i < players_hand2.size(); i++){
+				cout << players_hand2[i].r << " of " << players_hand2[i].s << endl;
+			}
+		}
+		if (!players_hand3.empty()) {
+			cout << "Your third hand is: " << endl;
+			for(unsigned i = 0; i < players_hand3.size(); i++){
+				cout << players_hand3[i].r << " of " << players_hand3[i].s << endl;
+			}
+		}
+		if (!players_hand4.empty()) {
+			cout << "Your fourth hand is: " << endl;
+			for(unsigned i = 0; i < players_hand4.size(); i++){
+				cout << players_hand4[i].r << " of " << players_hand4[i].s << endl;
+			}
 		}
 		cout << "The houses hand is:" << endl;
 		for(unsigned i = 0; i < house_hand.size(); i++){
@@ -75,6 +102,9 @@ int main( int argc, char ** argv ) {
 void shuffle(vector<card> &deck) {
 	// Erase both the player's and the house's hand
 	players_hand.erase(players_hand.begin(), players_hand.end());
+	players_hand2.erase(players_hand2.begin(), players_hand2.end());
+	players_hand3.erase(players_hand3.begin(), players_hand3.end());
+	players_hand4.erase(players_hand4.begin(), players_hand4.end());
 	house_hand.erase(house_hand.begin(), house_hand.end());
 	deck = {
 		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
@@ -133,6 +163,9 @@ void dealCards(vector<card> &deck, vector<card> &players_hand, vector<card> &hou
 	houseBlackjack = false;		//Clear all the important flags
 	insurance = false;
 	playerDouble = false;
+	playerDouble2 = false;
+	playerDouble3 = false;
+	playerDouble4 = false;
 	playerSurrender = false;
 	firstHand = true;
 	int c; 								//random number used to deal a card from the deck
@@ -175,11 +208,56 @@ void doubleDown(vector<card> &players_hand) {
 	c = rand() % deck.size(); 			//generate random card number
 	players_hand.push_back(deck[c]); 	//deal first card to players hand
 	deck.erase(deck.begin() + c); 		//remove dealt card from the deck
-	playerDouble = true;
+	if (&players_hand == &players_hand2) {
+		playerDouble2 = true;
+	} else if (&players_hand == &players_hand3) {
+		playerDouble3 = true;
+	} else if (&players_hand == &players_hand4) {
+		playerDouble4 = true;
+	} else {
+		playerDouble = true;
+	}
+
 }
 
 void surrender(vector<card> &players_hand) {
 	playerSurrender = true; //Sets the player to surrender
+}
+
+void split(vector<card> &players_hand) {
+	card temp;
+	if (players_hand2.empty()) {
+		temp = players_hand.back();
+		players_hand.pop_back();
+		players_hand2.push_back(temp);
+		hit(players_hand);
+		hit(players_hand2);
+		firstHand = true;
+		playerLogic(players_hand);
+		firstHand = true;
+		playerLogic(players_hand2);
+	} else if (players_hand3.empty()) {
+		temp = players_hand.back();
+		players_hand.pop_back();
+		players_hand3.push_back(temp);
+		hit(players_hand);
+		hit(players_hand3);
+		firstHand = true;
+		playerLogic(players_hand);
+		firstHand = true;
+		playerLogic(players_hand3);
+	} else if (players_hand4.empty()) {
+		temp = players_hand.back();
+		players_hand.pop_back();
+		players_hand4.push_back(temp);
+		hit(players_hand);
+		hit(players_hand4);
+		firstHand = true;
+		playerLogic(players_hand);
+		firstHand = true;
+		playerLogic(players_hand4);
+	} else {
+	}
 }
 
 // A function that plays one full game of Blackjack
@@ -196,70 +274,338 @@ void play() {
 		playerLogic(players_hand); // Hit/stay for the player
 		houseLogic(house_hand); // Hit/stay for the house
 
-		// Calculate the player and house sums
-		for(unsigned int i = 0; i < players_hand.size(); i++) {
-			player_sum += players_hand[i].r;
-		}
-		for(unsigned int i = 0; i < players_hand.size(); i++) {
-			if (players_hand[i].r == 1) {
-				if ((player_sum + 10) < 22) {
-					player_sum += 10;
+		if (players_hand2.empty()) {
+			// Calculate the player and house sums
+			for(unsigned int i = 0; i < players_hand.size(); i++) {
+				player_sum += players_hand[i].r;
+			}
+			for(unsigned int i = 0; i < players_hand.size(); i++) {
+				if (players_hand[i].r == 1) {
+					if ((player_sum + 10) < 22) {
+						player_sum += 10;
+					}
 				}
 			}
-		}
 
-		for(unsigned int i = 0; i < house_hand.size(); i++) {
-			house_sum += house_hand[i].r;
-		}
-		for(unsigned int i = 0; i < house_hand.size(); i++) {
-			if (house_hand[i].r == 1) {
-				if ((house_sum + 10) < 22) {
-					house_sum += 10;
+			for(unsigned int i = 0; i < house_hand.size(); i++) {
+				house_sum += house_hand[i].r;
+			}
+			for(unsigned int i = 0; i < house_hand.size(); i++) {
+				if (house_hand[i].r == 1) {
+					if ((house_sum + 10) < 22) {
+						house_sum += 10;
+					}
 				}
 			}
-		}
 
-		cout << "The player had: ";
-		cout << player_sum << endl;
+			cout << "The player had: ";
+			cout << player_sum << endl;
 
-		cout << "The dealer had: ";
-		cout << house_sum << endl;
+			cout << "The dealer had: ";
+			cout << house_sum << endl;
 
-		// Win or Lose conditions
-		if (playerSurrender) {
-			cout << "YOU SURRENDERED" << endl;
-			players_bank -= players_bet/2;
-		} else if(playerDouble){
-			if (player_sum > 21) {
-				cout << "YOU LOST THE DOUBLE" << endl;
-				players_bank -= (2 * players_bet);
-			} else if (house_sum > 21) {
-				cout << "YOU WINN THE DOUBLE" << endl;
-				players_bank += (2 * players_bet);
-			} else if (player_sum < house_sum) {
-				cout << "YOU LOST THE DOUBLE" << endl;
-				players_bank -= (2 * players_bet);
-			} else if (player_sum > house_sum) {
-				cout << "YOU WINN THE DOUBLE" << endl;
-				players_bank += (2 * players_bet);
+			// Win or Lose conditions
+			if (playerSurrender) {
+				cout << "YOU SURRENDERED" << endl;
+				players_bank -= players_bet/2;
+			} else if(playerDouble){
+				if (player_sum > 21) {
+					cout << "YOU LOST THE DOUBLE" << endl;
+					players_bank -= (2 * players_bet);
+				} else if (house_sum > 21) {
+					cout << "YOU WINN THE DOUBLE" << endl;
+					players_bank += (2 * players_bet);
+				} else if (player_sum < house_sum) {
+					cout << "YOU LOST THE DOUBLE" << endl;
+					players_bank -= (2 * players_bet);
+				} else if (player_sum > house_sum) {
+					cout << "YOU WINN THE DOUBLE" << endl;
+					players_bank += (2 * players_bet);
+				} else {
+					cout << "PUSH" << endl;
+				}
 			} else {
-				cout << "PUSH" << endl;
+				if (player_sum > 21) {
+					cout << "YOU LOSE!!" << endl;
+					players_bank -= players_bet;
+				} else if (house_sum > 21) {
+					cout << "YOU WINN!!!!" << endl;
+					players_bank += players_bet;
+				} else if (player_sum < house_sum) {
+					cout << "YOU LOSE!!" << endl;
+					players_bank -= players_bet;
+				} else if (player_sum > house_sum) {
+					cout << "YOU WINN!!!!" << endl;
+					players_bank += players_bet;
+				} else {
+					cout << "PUSH" << endl;
+				}
 			}
 		} else {
-			if (player_sum > 21) {
-				cout << "YOU LOSE!!" << endl;
-				players_bank -= players_bet;
-			} else if (house_sum > 21) {
-				cout << "YOU WINN!!!!" << endl;
-				players_bank += players_bet;
-			} else if (player_sum < house_sum) {
-				cout << "YOU LOSE!!" << endl;
-				players_bank -= players_bet;
-			} else if (player_sum > house_sum) {
-				cout << "YOU WINN!!!!" << endl;
-				players_bank += players_bet;
+			player_sum = 0;
+			house_sum = 0;
+			// Calculate the player and house sums
+			for(unsigned int i = 0; i < players_hand.size(); i++) {
+				player_sum += players_hand[i].r;
+			}
+			for(unsigned int i = 0; i < players_hand.size(); i++) {
+				if (players_hand[i].r == 1) {
+					if ((player_sum + 10) < 22) {
+						player_sum += 10;
+					}
+				}
+			}
+
+			for(unsigned int i = 0; i < house_hand.size(); i++) {
+				house_sum += house_hand[i].r;
+			}
+			for(unsigned int i = 0; i < house_hand.size(); i++) {
+				if (house_hand[i].r == 1) {
+					if ((house_sum + 10) < 22) {
+						house_sum += 10;
+					}
+				}
+			}
+
+			cout << "The player had: ";
+			cout << player_sum << endl;
+
+			cout << "The dealer had: ";
+			cout << house_sum << endl;
+
+			// Win or Lose conditions
+			if(playerDouble){
+				if (player_sum > 21) {
+					cout << "YOU LOST THE DOUBLE" << endl;
+					players_bank -= (2 * players_bet);
+				} else if (house_sum > 21) {
+					cout << "YOU WINN THE DOUBLE" << endl;
+					players_bank += (2 * players_bet);
+				} else if (player_sum < house_sum) {
+					cout << "YOU LOST THE DOUBLE" << endl;
+					players_bank -= (2 * players_bet);
+				} else if (player_sum > house_sum) {
+					cout << "YOU WINN THE DOUBLE" << endl;
+					players_bank += (2 * players_bet);
+				} else {
+					cout << "PUSH" << endl;
+				}
 			} else {
-				cout << "PUSH" << endl;
+				if (player_sum > 21) {
+					cout << "YOU LOSE!!" << endl;
+					players_bank -= players_bet;
+				} else if (house_sum > 21) {
+					cout << "YOU WINN!!!!" << endl;
+					players_bank += players_bet;
+				} else if (player_sum < house_sum) {
+					cout << "YOU LOSE!!" << endl;
+					players_bank -= players_bet;
+				} else if (player_sum > house_sum) {
+					cout << "YOU WINN!!!!" << endl;
+					players_bank += players_bet;
+				} else {
+					cout << "PUSH" << endl;
+				}
+			}
+
+			player_sum = 0;
+			house_sum = 0;
+			// Calculate the player and house sums
+			for(unsigned int i = 0; i < players_hand2.size(); i++) {
+				player_sum += players_hand2[i].r;
+			}
+			for(unsigned int i = 0; i < players_hand2.size(); i++) {
+				if (players_hand2[i].r == 1) {
+					if ((player_sum + 10) < 22) {
+						player_sum += 10;
+					}
+				}
+			}
+
+			for(unsigned int i = 0; i < house_hand.size(); i++) {
+				house_sum += house_hand[i].r;
+			}
+			for(unsigned int i = 0; i < house_hand.size(); i++) {
+				if (house_hand[i].r == 1) {
+					if ((house_sum + 10) < 22) {
+						house_sum += 10;
+					}
+				}
+			}
+
+			cout << "The player had: ";
+			cout << player_sum << endl;
+
+			cout << "The dealer had: ";
+			cout << house_sum << endl;
+
+			// Win or Lose conditions
+			if(playerDouble2){
+				if (player_sum > 21) {
+					cout << "YOU LOST THE DOUBLE" << endl;
+					players_bank -= (2 * players_bet);
+				} else if (house_sum > 21) {
+					cout << "YOU WINN THE DOUBLE" << endl;
+					players_bank += (2 * players_bet);
+				} else if (player_sum < house_sum) {
+					cout << "YOU LOST THE DOUBLE" << endl;
+					players_bank -= (2 * players_bet);
+				} else if (player_sum > house_sum) {
+					cout << "YOU WINN THE DOUBLE" << endl;
+					players_bank += (2 * players_bet);
+				} else {
+					cout << "PUSH" << endl;
+				}
+			} else {
+				if (player_sum > 21) {
+					cout << "YOU LOSE!!" << endl;
+					players_bank -= players_bet;
+				} else if (house_sum > 21) {
+					cout << "YOU WINN!!!!" << endl;
+					players_bank += players_bet;
+				} else if (player_sum < house_sum) {
+					cout << "YOU LOSE!!" << endl;
+					players_bank -= players_bet;
+				} else if (player_sum > house_sum) {
+					cout << "YOU WINN!!!!" << endl;
+					players_bank += players_bet;
+				} else {
+					cout << "PUSH" << endl;
+				}
+			}
+			if (!players_hand3.empty()) {
+				player_sum = 0;
+				house_sum = 0;
+				// Calculate the player and house sums
+				for(unsigned int i = 0; i < players_hand3.size(); i++) {
+					player_sum += players_hand3[i].r;
+				}
+				for(unsigned int i = 0; i < players_hand3.size(); i++) {
+					if (players_hand3[i].r == 1) {
+						if ((player_sum + 10) < 22) {
+							player_sum += 10;
+						}
+					}
+				}
+
+				for(unsigned int i = 0; i < house_hand.size(); i++) {
+					house_sum += house_hand[i].r;
+				}
+				for(unsigned int i = 0; i < house_hand.size(); i++) {
+					if (house_hand[i].r == 1) {
+						if ((house_sum + 10) < 22) {
+							house_sum += 10;
+						}
+					}
+				}
+
+				cout << "The player had: ";
+				cout << player_sum << endl;
+
+				cout << "The dealer had: ";
+				cout << house_sum << endl;
+
+				// Win or Lose conditions
+				if(playerDouble3){
+					if (player_sum > 21) {
+						cout << "YOU LOST THE DOUBLE" << endl;
+						players_bank -= (2 * players_bet);
+					} else if (house_sum > 21) {
+						cout << "YOU WINN THE DOUBLE" << endl;
+						players_bank += (2 * players_bet);
+					} else if (player_sum < house_sum) {
+						cout << "YOU LOST THE DOUBLE" << endl;
+						players_bank -= (2 * players_bet);
+					} else if (player_sum > house_sum) {
+						cout << "YOU WINN THE DOUBLE" << endl;
+						players_bank += (2 * players_bet);
+					} else {
+						cout << "PUSH" << endl;
+					}
+				} else {
+					if (player_sum > 21) {
+						cout << "YOU LOSE!!" << endl;
+						players_bank -= players_bet;
+					} else if (house_sum > 21) {
+						cout << "YOU WINN!!!!" << endl;
+						players_bank += players_bet;
+					} else if (player_sum < house_sum) {
+						cout << "YOU LOSE!!" << endl;
+						players_bank -= players_bet;
+					} else if (player_sum > house_sum) {
+						cout << "YOU WINN!!!!" << endl;
+						players_bank += players_bet;
+					} else {
+						cout << "PUSH" << endl;
+					}
+				}
+			}
+			if (!players_hand4.empty()) {
+				player_sum = 0;
+				house_sum = 0;
+				// Calculate the player and house sums
+				for(unsigned int i = 0; i < players_hand4.size(); i++) {
+					player_sum += players_hand4[i].r;
+				}
+				for(unsigned int i = 0; i < players_hand4.size(); i++) {
+					if (players_hand4[i].r == 1) {
+						if ((player_sum + 10) < 22) {
+							player_sum += 10;
+						}
+					}
+				}
+
+				for(unsigned int i = 0; i < house_hand.size(); i++) {
+					house_sum += house_hand[i].r;
+				}
+				for(unsigned int i = 0; i < house_hand.size(); i++) {
+					if (house_hand[i].r == 1) {
+						if ((house_sum + 10) < 22) {
+							house_sum += 10;
+						}
+					}
+				}
+
+				cout << "The player had: ";
+				cout << player_sum << endl;
+
+				cout << "The dealer had: ";
+				cout << house_sum << endl;
+
+				// Win or Lose conditions
+				if(playerDouble4){
+					if (player_sum > 21) {
+						cout << "YOU LOST THE DOUBLE" << endl;
+						players_bank -= (2 * players_bet);
+					} else if (house_sum > 21) {
+						cout << "YOU WINN THE DOUBLE" << endl;
+						players_bank += (2 * players_bet);
+					} else if (player_sum < house_sum) {
+						cout << "YOU LOST THE DOUBLE" << endl;
+						players_bank -= (2 * players_bet);
+					} else if (player_sum > house_sum) {
+						cout << "YOU WINN THE DOUBLE" << endl;
+						players_bank += (2 * players_bet);
+					} else {
+						cout << "PUSH" << endl;
+					}
+				} else {
+					if (player_sum > 21) {
+						cout << "YOU LOSE!!" << endl;
+						players_bank -= players_bet;
+					} else if (house_sum > 21) {
+						cout << "YOU WINN!!!!" << endl;
+						players_bank += players_bet;
+					} else if (player_sum < house_sum) {
+						cout << "YOU LOSE!!" << endl;
+						players_bank -= players_bet;
+					} else if (player_sum > house_sum) {
+						cout << "YOU WINN!!!!" << endl;
+						players_bank += players_bet;
+					} else {
+						cout << "PUSH" << endl;
+					}
+				}
 			}
 		}
 	} else if (playerBlackjack && !houseBlackjack) {
@@ -387,33 +733,218 @@ void playerLogic(vector<card> &players_hand) {
 	// Every player action based on the dealer upcard
 	if (!playerSoftHand) {
 		switch(player_sum) {
-		case 2:
-			hit(players_hand);
-			playerLogic(players_hand);
-			break;
-		case 3:
-			hit(players_hand);
-			playerLogic(players_hand);
-			break;
 		case 4:
-			hit(players_hand);
-			playerLogic(players_hand);
+			switch(house_sum) {
+			case 1:
+				hit(players_hand);
+				playerLogic(players_hand);
+				break;
+			case 2:
+				if (players_hand4.empty()) {
+					split(players_hand);
+				} else {
+					hit(players_hand);
+					playerLogic(players_hand);
+				}
+				break;
+			case 3:
+				if (players_hand4.empty()) {
+					split(players_hand);
+				} else {
+					hit(players_hand);
+					playerLogic(players_hand);
+				}
+				break;
+			case 4:
+				if (players_hand4.empty()) {
+					split(players_hand);
+				} else {
+					hit(players_hand);
+					playerLogic(players_hand);
+				}
+				break;
+			case 5:
+				if (players_hand4.empty()) {
+					split(players_hand);
+				} else {
+					hit(players_hand);
+					playerLogic(players_hand);
+				}
+				break;
+			case 6:
+				if (players_hand4.empty()) {
+					split(players_hand);
+				} else {
+					hit(players_hand);
+					playerLogic(players_hand);
+				}
+				break;
+			case 7:
+				if (players_hand4.empty()) {
+					split(players_hand);
+				} else {
+					hit(players_hand);
+					playerLogic(players_hand);
+				}
+				break;
+			case 8:
+				hit(players_hand);
+				playerLogic(players_hand);
+				break;
+			case 9:
+				hit(players_hand);
+				playerLogic(players_hand);
+				break;
+			case 10:
+				hit(players_hand);
+				playerLogic(players_hand);
+				break;
+			default:
+				break;
+			}
 			break;
 		case 5:
 			hit(players_hand);
 			playerLogic(players_hand);
 			break;
 		case 6:
-			hit(players_hand);
-			playerLogic(players_hand);
+			if ((players_hand[0].r == 3) && (players_hand[1].r == 3)) {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 3:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 4:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 5:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 6:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 7:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
+			} else {
+				hit(players_hand);
+				playerLogic(players_hand);
+			}
 			break;
 		case 7:
 			hit(players_hand);
 			playerLogic(players_hand);
 			break;
 		case 8:
-			hit(players_hand);
-			playerLogic(players_hand);
+			if ((players_hand[0].r == 4) && (players_hand[1].r == 4)) {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 3:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 4:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 5:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 6:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 7:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
+			} else {
+				hit(players_hand);
+				playerLogic(players_hand);
+			}
+			break;
 			break;
 		case 9:
 			switch(house_sum) {
@@ -638,43 +1169,110 @@ void playerLogic(vector<card> &players_hand) {
 			}
 			break;
 		case 12:
-			switch(house_sum) {
-			case 1:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 2:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 3:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 8:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 9:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 10:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			default:
-				break;
+			if ((players_hand[0].r == 6) && (players_hand[1].r == 6)) {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 3:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 4:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 5:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 6:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 7:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
+			} else {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 3:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				case 6:
+					break;
+				case 7:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
 			}
 			break;
 		case 13:
@@ -714,39 +1312,110 @@ void playerLogic(vector<card> &players_hand) {
 			}
 			break;
 		case 14:
-			switch(house_sum) {
-			case 1:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 8:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 9:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 10:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			default:
-				break;
+			if ((players_hand[0].r == 7) && (players_hand[1].r == 7)) {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 3:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 4:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 5:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 6:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 7:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
+			} else {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				case 6:
+					break;
+				case 7:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
 			}
 			break;
 		case 15:
@@ -779,7 +1448,12 @@ void playerLogic(vector<card> &players_hand) {
 				break;
 			case 10:
 				if (firstHand) {
-					surrender(players_hand);
+					if (players_hand2.empty()) {
+						surrender(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
 				} else {
 					hit(players_hand);
 					playerLogic(players_hand);
@@ -790,52 +1464,184 @@ void playerLogic(vector<card> &players_hand) {
 			}
 			break;
 		case 16:
-			switch(house_sum) {
-			case 1:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 8:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 9:
-				if (firstHand) {
-					surrender(players_hand);
-				} else {
+			if ((players_hand[0].r == 8) && (players_hand[1].r == 8)) {
+				switch(house_sum) {
+				case 1:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 2:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 3:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 4:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 5:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 6:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 7:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 8:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 9:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 10:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				default:
+					break;
+				}
+			} else {
+				switch(house_sum) {
+				case 1:
 					hit(players_hand);
 					playerLogic(players_hand);
-				}
-				break;
-			case 10:
-				if (firstHand) {
-					surrender(players_hand);
-				} else {
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				case 5:
+					break;
+				case 6:
+					break;
+				case 7:
 					hit(players_hand);
 					playerLogic(players_hand);
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					if (firstHand) {
+						if (players_hand2.empty()) {
+							surrender(players_hand);
+						} else {
+							hit(players_hand);
+							playerLogic(players_hand);
+						}
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				case 10:
+					if (firstHand) {
+						if (players_hand2.empty()) {
+							surrender(players_hand);
+						} else {
+							hit(players_hand);
+							playerLogic(players_hand);
+						}
+					} else {
+						hit(players_hand);
+						playerLogic(players_hand);
+					}
+					break;
+				default:
+					break;
 				}
-				break;
-			default:
-				break;
 			}
 			break;
 		case 17:
 			break;
 		case 18:
+			if ((players_hand[0].r == 9) && (players_hand[1].r == 9)) {
+				switch(house_sum) {
+				case 1:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 2:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 3:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 4:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 5:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 6:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 7:
+					break;
+				case 8:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 9:
+					if (players_hand4.empty()) {
+						split(players_hand);
+					}
+					break;
+				case 10:
+					break;
+				default:
+					break;
+				}
+			}
 			break;
 		case 19:
 			break;
@@ -849,49 +1655,53 @@ void playerLogic(vector<card> &players_hand) {
 	} else {
 		switch(player_sum) {
 		case 12:
-			switch(house_sum) {
-			case 1:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 2:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 3:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 4:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 5:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 6:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 7:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 8:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 9:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			case 10:
-				hit(players_hand);
-				playerLogic(players_hand);
-				break;
-			default:
-				break;
+			if (players_hand4.empty()) {
+				split(players_hand);
+			} else {
+				switch(house_sum) {
+				case 1:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 2:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 3:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 4:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 5:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 6:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 7:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 8:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 9:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				case 10:
+					hit(players_hand);
+					playerLogic(players_hand);
+					break;
+				default:
+					break;
+				}
 			}
 			break;
 		case 13:
