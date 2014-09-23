@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
+#include <random>
 using namespace std;
 
 const string SPD = "Spade";  // keywords simply used to make the code shorter
@@ -60,14 +61,16 @@ void houseLogic(vector<card> &house_hand);
 void play(); // Plays a single perfect game for the player
 
 int main( int argc, char ** argv ) {
-	srand(time(NULL));		// Seeds the rand generator used to deal cards from the deck
+	//srand(time(NULL));		// Seeds the rand generator used to deal cards from the deck
 	string command = "";	// User input
-
 	// when the user input is anything but q, deal a game of blackjack and print
 	//  the results
-	while(command != "q") {
-		play();
-
+	//while(command != "q") {
+	for (int i = 0; i < 1000; i++) {
+		for (int j = 0; j < 1000; j++) {
+			play();
+		}
+	}
 		// Prints the users bankroll after the last game of BJ
 		cout << players_bank << endl;
 
@@ -101,7 +104,7 @@ int main( int argc, char ** argv ) {
 		}
 		// Get next command from user
 		cin >> command;
-	}
+	//}
 	return 0;
 }
 // Resets the deck and the house/player hands
@@ -114,46 +117,6 @@ void shuffle(vector<card> &deck) {
 	house_hand.erase(house_hand.begin(), house_hand.end());
 	// Reshuffle the six decks
 	deck = {
-		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
-		{ 8, SPD, "Eight" }, { 9, SPD, "Nine" }, { 10, SPD, "Ten" }, { 10, SPD, "Jack" }, { 10, SPD, "Queen" }, { 10, SPD, "King" },
-		{ 1, HRT, "Ace" }, { 2, HRT, "Two" }, { 3, HRT, "Three" }, { 4, HRT, "Four" }, { 5, HRT, "Five" }, { 6, HRT, "Six" }, { 7, HRT, "Seven" },
-		{ 8, HRT, "Eight" }, { 9, HRT, "Nine" }, { 10, HRT, "Ten" }, { 10, HRT, "Jack" }, { 10, HRT, "Queen" }, { 10, HRT, "King" },
-		{ 1, DIA, "Ace" }, { 2, DIA, "Two" }, { 3, DIA, "Three" }, { 4, DIA, "Four" }, { 5, DIA, "Five" }, { 6, DIA, "Six" }, { 7, DIA, "Seven" },
-		{ 8, DIA, "Eight" }, { 9, DIA, "Nine" }, { 10, DIA, "Ten" }, { 10, DIA, "Jack" }, { 10, DIA, "Queen" }, { 10, DIA, "King" },
-		{ 1, CLB, "Ace" }, { 2, CLB, "Two" }, { 3, CLB, "Three" }, { 4, CLB, "Four" }, { 5, CLB, "Five" }, { 6, CLB, "Six" }, { 7, CLB, "Sever" },
-		{ 8, CLB, "Eight" }, { 9, CLB, "Nine" }, { 10, CLB, "Ten" }, { 10, CLB, "Jack" }, { 10, CLB, "Queen" }, { 10, CLB, "King" },
-		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
-		{ 8, SPD, "Eight" }, { 9, SPD, "Nine" }, { 10, SPD, "Ten" }, { 10, SPD, "Jack" }, { 10, SPD, "Queen" }, { 10, SPD, "King" },
-		{ 1, HRT, "Ace" }, { 2, HRT, "Two" }, { 3, HRT, "Three" }, { 4, HRT, "Four" }, { 5, HRT, "Five" }, { 6, HRT, "Six" }, { 7, HRT, "Seven" },
-		{ 8, HRT, "Eight" }, { 9, HRT, "Nine" }, { 10, HRT, "Ten" }, { 10, HRT, "Jack" }, { 10, HRT, "Queen" }, { 10, HRT, "King" },
-		{ 1, DIA, "Ace" }, { 2, DIA, "Two" }, { 3, DIA, "Three" }, { 4, DIA, "Four" }, { 5, DIA, "Five" }, { 6, DIA, "Six" }, { 7, DIA, "Seven" },
-		{ 8, DIA, "Eight" }, { 9, DIA, "Nine" }, { 10, DIA, "Ten" }, { 10, DIA, "Jack" }, { 10, DIA, "Queen" }, { 10, DIA, "King" },
-		{ 1, CLB, "Ace" }, { 2, CLB, "Two" }, { 3, CLB, "Three" }, { 4, CLB, "Four" }, { 5, CLB, "Five" }, { 6, CLB, "Six" }, { 7, CLB, "Sever" },
-		{ 8, CLB, "Eight" }, { 9, CLB, "Nine" }, { 10, CLB, "Ten" }, { 10, CLB, "Jack" }, { 10, CLB, "Queen" }, { 10, CLB, "King" },
-		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
-		{ 8, SPD, "Eight" }, { 9, SPD, "Nine" }, { 10, SPD, "Ten" }, { 10, SPD, "Jack" }, { 10, SPD, "Queen" }, { 10, SPD, "King" },
-		{ 1, HRT, "Ace" }, { 2, HRT, "Two" }, { 3, HRT, "Three" }, { 4, HRT, "Four" }, { 5, HRT, "Five" }, { 6, HRT, "Six" }, { 7, HRT, "Seven" },
-		{ 8, HRT, "Eight" }, { 9, HRT, "Nine" }, { 10, HRT, "Ten" }, { 10, HRT, "Jack" }, { 10, HRT, "Queen" }, { 10, HRT, "King" },
-		{ 1, DIA, "Ace" }, { 2, DIA, "Two" }, { 3, DIA, "Three" }, { 4, DIA, "Four" }, { 5, DIA, "Five" }, { 6, DIA, "Six" }, { 7, DIA, "Seven" },
-		{ 8, DIA, "Eight" }, { 9, DIA, "Nine" }, { 10, DIA, "Ten" }, { 10, DIA, "Jack" }, { 10, DIA, "Queen" }, { 10, DIA, "King" },
-		{ 1, CLB, "Ace" }, { 2, CLB, "Two" }, { 3, CLB, "Three" }, { 4, CLB, "Four" }, { 5, CLB, "Five" }, { 6, CLB, "Six" }, { 7, CLB, "Sever" },
-		{ 8, CLB, "Eight" }, { 9, CLB, "Nine" }, { 10, CLB, "Ten" }, { 10, CLB, "Jack" }, { 10, CLB, "Queen" }, { 10, CLB, "King" },
-		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
-		{ 8, SPD, "Eight" }, { 9, SPD, "Nine" }, { 10, SPD, "Ten" }, { 10, SPD, "Jack" }, { 10, SPD, "Queen" }, { 10, SPD, "King" },
-		{ 1, HRT, "Ace" }, { 2, HRT, "Two" }, { 3, HRT, "Three" }, { 4, HRT, "Four" }, { 5, HRT, "Five" }, { 6, HRT, "Six" }, { 7, HRT, "Seven" },
-		{ 8, HRT, "Eight" }, { 9, HRT, "Nine" }, { 10, HRT, "Ten" }, { 10, HRT, "Jack" }, { 10, HRT, "Queen" }, { 10, HRT, "King" },
-		{ 1, DIA, "Ace" }, { 2, DIA, "Two" }, { 3, DIA, "Three" }, { 4, DIA, "Four" }, { 5, DIA, "Five" }, { 6, DIA, "Six" }, { 7, DIA, "Seven" },
-		{ 8, DIA, "Eight" }, { 9, DIA, "Nine" }, { 10, DIA, "Ten" }, { 10, DIA, "Jack" }, { 10, DIA, "Queen" }, { 10, DIA, "King" },
-		{ 1, CLB, "Ace" }, { 2, CLB, "Two" }, { 3, CLB, "Three" }, { 4, CLB, "Four" }, { 5, CLB, "Five" }, { 6, CLB, "Six" }, { 7, CLB, "Sever" },
-		{ 8, CLB, "Eight" }, { 9, CLB, "Nine" }, { 10, CLB, "Ten" }, { 10, CLB, "Jack" }, { 10, CLB, "Queen" }, { 10, CLB, "King" },
-		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
-		{ 8, SPD, "Eight" }, { 9, SPD, "Nine" }, { 10, SPD, "Ten" }, { 10, SPD, "Jack" }, { 10, SPD, "Queen" }, { 10, SPD, "King" },
-		{ 1, HRT, "Ace" }, { 2, HRT, "Two" }, { 3, HRT, "Three" }, { 4, HRT, "Four" }, { 5, HRT, "Five" }, { 6, HRT, "Six" }, { 7, HRT, "Seven" },
-		{ 8, HRT, "Eight" }, { 9, HRT, "Nine" }, { 10, HRT, "Ten" }, { 10, HRT, "Jack" }, { 10, HRT, "Queen" }, { 10, HRT, "King" },
-		{ 1, DIA, "Ace" }, { 2, DIA, "Two" }, { 3, DIA, "Three" }, { 4, DIA, "Four" }, { 5, DIA, "Five" }, { 6, DIA, "Six" }, { 7, DIA, "Seven" },
-		{ 8, DIA, "Eight" }, { 9, DIA, "Nine" }, { 10, DIA, "Ten" }, { 10, DIA, "Jack" }, { 10, DIA, "Queen" }, { 10, DIA, "King" },
-		{ 1, CLB, "Ace" }, { 2, CLB, "Two" }, { 3, CLB, "Three" }, { 4, CLB, "Four" }, { 5, CLB, "Five" }, { 6, CLB, "Six" }, { 7, CLB, "Sever" },
-		{ 8, CLB, "Eight" }, { 9, CLB, "Nine" }, { 10, CLB, "Ten" }, { 10, CLB, "Jack" }, { 10, CLB, "Queen" }, { 10, CLB, "King" },
 		{ 1, SPD, "Ace" }, { 2, SPD, "Two" }, { 3, SPD, "Three" }, { 4, SPD, "Four" }, { 5, SPD, "Five" }, { 6, SPD, "Six" }, { 7, SPD, "Seven" },
 		{ 8, SPD, "Eight" }, { 9, SPD, "Nine" }, { 10, SPD, "Ten" }, { 10, SPD, "Jack" }, { 10, SPD, "Queen" }, { 10, SPD, "King" },
 		{ 1, HRT, "Ace" }, { 2, HRT, "Two" }, { 3, HRT, "Three" }, { 4, HRT, "Four" }, { 5, HRT, "Five" }, { 6, HRT, "Six" }, { 7, HRT, "Seven" },
@@ -175,22 +138,19 @@ void dealCards(vector<card> &deck, vector<card> &players_hand, vector<card> &hou
 	playerDouble4 = false;
 	playerSurrender = false;
 	firstHand = true;
-	int c; 								//random number used to deal a card from the deck
-	c = rand() % deck.size(); 			//generate random card number
-	players_hand.push_back(deck[c]);	//deal first card to players hand
-	deck.erase(deck.begin() + c); 		//remove dealt card from the deck
+	static mt19937 mt(time(NULL));
+	uniform_int_distribution<int> dist( 0, 51) ;
+	players_hand.push_back(deck[dist(mt)]);	//deal first card to players hand
+	//deck.erase(deck.begin() + dist(mt)); 		//remove dealt card from the deck
 
-	c = rand() % deck.size(); 		//generate another random card number
-	house_hand.push_back(deck[c]); 	//deal the first card to the house
-	deck.erase(deck.begin() + c); 	//remove dealt card from the deck
+	house_hand.push_back(deck[dist(mt)]); 	//deal the first card to the house
+	//deck.erase(deck.begin() + dist(mt)); 	//remove dealt card from the deck
 
-	c = rand() % deck.size(); 			//generate another random card number
-	players_hand.push_back(deck[c]); 	//deal the second card to the player
-	deck.erase(deck.begin() + c); 		//remove dealt card from the deck
+	players_hand.push_back(deck[dist(mt)]);	//deal first card to players hand
+	//deck.erase(deck.begin() + dist(mt)); 		//remove dealt card from the deck
 
-	c = rand() % deck.size(); 		//generate another random card number
-	house_hand.push_back(deck[c]); 	//deal the second card to the house
-	deck.erase(deck.begin() + c); 	//remove dealt card from the deck
+	house_hand.push_back(deck[dist(mt)]); 	//deal the first card to the house
+	//deck.erase(deck.begin() + dist(mt)); 	//remove dealt card from the deck
 
 	// Checks whether player has Blackjack and sets the appropriate flag
 	if (((players_hand[0].r == 10) && (players_hand[1].r == 1)) || ((players_hand[0].r == 1) && (players_hand[1].r == 10))) {
@@ -207,17 +167,17 @@ void dealCards(vector<card> &deck, vector<card> &players_hand, vector<card> &hou
 
 void hit(vector<card> &players_hand) {
 	firstHand = false;					// It's no longer the first hand
-	int c; 								//random number used to deal a card from the deck
-	c = rand() % deck.size(); 			//generate random card number
-	players_hand.push_back(deck[c]); 	//deal first card to players hand
-	deck.erase(deck.begin() + c); 		//remove dealt card from the deck
+	static mt19937 mt(time(NULL));
+	uniform_int_distribution<int> dist( 0, 51) ;
+	players_hand.push_back(deck[dist(mt)]); 	//deal first card to players hand
+	//deck.erase(deck.begin() + c); 		//remove dealt card from the deck
 }
 
 void doubleDown(vector<card> &players_hand) {
-	int c; 								//random number used to deal a card from the deck
-	c = rand() % deck.size(); 			//generate random card number
-	players_hand.push_back(deck[c]); 	//deal first card to players hand
-	deck.erase(deck.begin() + c); 		//remove dealt card from the deck
+	static mt19937 mt(time(NULL));
+	uniform_int_distribution<int> dist( 0, 51) ;
+	players_hand.push_back(deck[dist(mt)]); 	//deal first card to players hand
+	//deck.erase(deck.begin() + c); 		//remove dealt card from the deck
 	// Set the flag for the deck the player doubled on
 	if (&players_hand == &players_hand2) {
 		playerDouble2 = true;
