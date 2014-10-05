@@ -57,6 +57,7 @@ void split(vector<card> &players_hand); 	// Player splits his hand, gets one mor
 void surrender(vector<card> &players_hand);  //Surrender the hand to the house, lose half of original bet
 void playerLogic(vector<card> &players_hand); // The logic the player will follow
 void houseLogic(vector<card> &house_hand);
+void printHands(); 			//prints the player and house hands
 void play(); // Plays a single perfect game for the player
 
 int main( int argc, char ** argv ) {
@@ -66,41 +67,56 @@ int main( int argc, char ** argv ) {
 	// when the user input is anything but q, deal a game of blackjack and print
 	//  the results
 	while(command != "q") {
-		play();
+		cout << "Blackjack Program Menu:" << endl;
+		cout << "1: Play one hand of BlackJack" << endl;
+		cout << "2: Play a certain number of hands of BlackJack" << endl;
+		cout << "3: Play 1 million hands of BlackJack and print statistical results" << endl;
+		cout << "q: quit" << endl;
+		cout << endl;
+		cout << "Please enter your selection: ";
 
-		// Prints the users bankroll after the last game of BJ
-		cout << players_bank << endl;
-
-		// Prints the players hand(s) after the game for the user to see
-		cout << "Your hand is: " << endl;
-		for(unsigned i = 0; i < players_hand.size(); i++){
-			cout << players_hand[i].r << " of " << players_hand[i].s << endl;
-		}
-		if (!players_hand2.empty()) {
-			cout << "Your second hand is: " << endl;
-			for(unsigned i = 0; i < players_hand2.size(); i++){
-				cout << players_hand2[i].r << " of " << players_hand2[i].s << endl;
-			}
-		}
-		if (!players_hand3.empty()) {
-			cout << "Your third hand is: " << endl;
-			for(unsigned i = 0; i < players_hand3.size(); i++){
-				cout << players_hand3[i].r << " of " << players_hand3[i].s << endl;
-			}
-		}
-		if (!players_hand4.empty()) {
-			cout << "Your fourth hand is: " << endl;
-			for(unsigned i = 0; i < players_hand4.size(); i++){
-				cout << players_hand4[i].r << " of " << players_hand4[i].s << endl;
-			}
-		}
-		// Prints the house hand for the user
-		cout << "The houses hand is:" << endl;
-		for(unsigned i = 0; i < house_hand.size(); i++){
-			cout << house_hand[i].r << " of " << house_hand[i].s << endl;
-		}
-		// Get next command from user
+		// Get user selection
 		cin >> command;
+		if (command == "1") {
+			play();
+
+			// Prints the users bankroll after the last game of BJ
+			cout << players_bank << endl;
+			printHands();
+		}
+		else if (command == "2") {
+			int num;
+			cout << "Please enter the number of hands to play: ";
+
+			cin >> num;
+
+			for (int i = 1; i <= num; i++) {
+				play();
+
+				// Prints the users bankroll after the last game of BJ
+				cout << players_bank << endl;
+
+				printHands();
+			}
+		}
+		else if (command == "3") {
+			for (int i = 1; i <= 1000; i++) {
+				for (int j = 1; j <= 1000; j++) {
+					play();
+
+					// Prints the users bankroll after the last game of BJ
+					cout << players_bank << endl;
+
+					printHands();
+				}
+			}
+		}
+		else if (command == "q") {
+			cout << "Quitting. Thanks for playing!" << endl;
+		}
+		else {
+			cout << "Invalid input" << endl;
+		}
 	}
 	return 0;
 }
@@ -2145,5 +2161,36 @@ void houseLogic(vector<card> &house_hand) {
 		break;
 	default:
 		break;
+	}
+}
+
+void printHands() {
+	// Prints the players hand(s) after the game for the user to see
+	cout << "Your hand is: " << endl;
+	for(unsigned i = 0; i < players_hand.size(); i++){
+		cout << players_hand[i].r << " of " << players_hand[i].s << endl;
+	}
+	if (!players_hand2.empty()) {
+		cout << "Your second hand is: " << endl;
+		for(unsigned i = 0; i < players_hand2.size(); i++){
+			cout << players_hand2[i].r << " of " << players_hand2[i].s << endl;
+		}
+	}
+	if (!players_hand3.empty()) {
+		cout << "Your third hand is: " << endl;
+		for(unsigned i = 0; i < players_hand3.size(); i++){
+			cout << players_hand3[i].r << " of " << players_hand3[i].s << endl;
+		}
+	}
+	if (!players_hand4.empty()) {
+		cout << "Your fourth hand is: " << endl;
+		for(unsigned i = 0; i < players_hand4.size(); i++){
+			cout << players_hand4[i].r << " of " << players_hand4[i].s << endl;
+		}
+	}
+	// Prints the house hand for the user
+	cout << "The houses hand is:" << endl;
+	for(unsigned i = 0; i < house_hand.size(); i++){
+		cout << house_hand[i].r << " of " << house_hand[i].s << endl;
 	}
 }
